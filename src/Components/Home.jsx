@@ -1,4 +1,8 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector,useDispatch} from "react-redux";
+import {  logout } from "../redux/authSlice";
+
 
 const cars = [
   {
@@ -22,6 +26,15 @@ const cars = [
 ];
 
 export default function Home() {
+  const user=useSelector((state)=>state.auth.user)
+  const dispatch = useDispatch();
+  const navigate=useNavigate();
+  const handleLogout=()=>{
+    dispatch(logout());
+    navigate("/")
+  }
+  
+//  dispatch(logout({ name: "John" }));
   return (
     <div className="bg-gray-950 text-white min-h-screen">
       
@@ -35,10 +48,25 @@ export default function Home() {
           <a className="hover:text-gray-300">Pricing</a>
           <a className="hover:text-gray-300">Contact</a>
         </div>
-
-        <button className="bg-white text-black px-5 py-2 rounded-lg font-semibold hover:bg-gray-200">
-          Login
-        </button>
+{!user ?
+       <div className="flex gap-4">
+        
+    <Link to="/register" ><button className="!bg-yellow-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-400">
+      Register
+    </button>
+</Link>
+  <Link to="/login">
+    <button className="!bg-yellow-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-400">
+      Login
+    </button>
+    </Link>
+  </div>: 
+    <button className="!bg-yellow-500 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-400" onClick={()=>handleLogout()
+    }>
+      Logout
+    </button>
+   
+}
       </nav>
 
       {/* Hero Section */}
@@ -55,7 +83,7 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex gap-4">
-            <button className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300">
+            <button className="!bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300">
               Browse Cars
             </button>
 
@@ -92,9 +120,9 @@ export default function Home() {
           className="bg-gray-800 p-3 rounded-lg outline-none"
         />
 
-        <button className="bg-yellow-400 text-black font-semibold rounded-lg">
-          Search
-        </button>
+    <button className="w-full !bg-yellow-400 text-black px-6 py-3 rounded-lg">
+  Search
+</button>
       </div>
 
       {/* Featured Cars */}
