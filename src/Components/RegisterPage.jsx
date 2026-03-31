@@ -88,7 +88,7 @@ const handleSubmit = async (e) => {
     )
     dispatch(loginSuccess({name:response}))
     console.log("Login successfull",login);
-    navigate('/home');
+    navigate('/');
  
   } catch (error) {
     console.error("Registration error:", error.response?.data);

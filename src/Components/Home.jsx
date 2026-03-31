@@ -26,7 +26,7 @@ const cars = [
 ];
 
 export default function Home() {
-  const user=useSelector((state)=>state.auth.user)
+  const user=useSelector((state)=>state.auth.user);
   const dispatch = useDispatch();
   const navigate=useNavigate();
   const handleLogout=()=>{
@@ -73,6 +73,7 @@ export default function Home() {
       <section className="grid md:grid-cols-2 items-center px-10 py-20 gap-10">
 
         <div>
+        {/* <h1>Hello {user.id} </h1> */}
           <h1 className="text-5xl md:text-6xl font-bold leading-tight">
             Rent Your <span className="text-yellow-400">Dream Car</span> Today
           </h1>

@@ -23,27 +23,35 @@ const dispatch=useDispatch();
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    dispatch(loginStart());
-    try{
-      const data={
-        email:formData.email,
-        password:formData.password
-      }
-    const response = await axios({
-      method,
-      url: `${BASE_URL}${url}`,
-      data,
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  dispatch(loginStart());
+
+  try {
+    const response = await axios.post(BASE_URL, {
+      email: formData.email,
+      password: formData.password
     });
 
-    dispatch(loginSuccess({name:response}))
-    navigate("/");
-    }catch(error){
-      dispatch(loginFailure(error.message))
-    }
-    // connect API here
-  };
+    const data = response.data; // ✅ IMPORTANT
+
+    // ✅ dispatch correct structure
+    dispatch(
+      loginSuccess({
+        user: { id: data.user_id },
+        role: data.role,
+        token: data.access_token
+      })
+    );
+
+    // ✅ redirect using backend response
+    navigate(data.dashboard_url);
+
+  } catch (error) {
+    dispatch(loginFailure(error.response?.data?.detail || "Login failed"));
+  }
+};
 
   return (
     <div className="bg-gray-950 text-white min-h-screen flex items-center justify-center">
