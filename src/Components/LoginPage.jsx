@@ -3,8 +3,12 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess,loginFailure,loginStart } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-export default function LoginPage() {
+export default  function  LoginPage() {
+  const BASE_URL = "http://127.0.0.1:8000/login";
+  const url = "";
+  const method = "POST";
 const dispatch=useDispatch();
  const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -19,12 +23,21 @@ const dispatch=useDispatch();
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(loginStart());
     try{
-    console.log(formData); 
-    dispatch(loginSuccess({name:formData.email}))
+      const data={
+        email:formData.email,
+        password:formData.password
+      }
+    const response = await axios({
+      method,
+      url: `${BASE_URL}${url}`,
+      data,
+    });
+
+    dispatch(loginSuccess({name:response}))
     navigate("/");
     }catch(error){
       dispatch(loginFailure(error.message))
