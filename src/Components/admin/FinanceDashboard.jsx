@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 // import { useSelector } from "react-redux";
-// import AdminLayout from "../components/AdminLayout";
-import AdminLayout from "./AdminLayout";
+
 
 const API = "http://127.0.0.1:8000/admin";
 
@@ -31,8 +30,8 @@ const token = localStorage.getItem("token")
   }, []);
 
   return (
-    <AdminLayout>
 
+<div>
       <h1 className="text-3xl text-yellow-400 mb-6">
         Finance Dashboard
       </h1>
@@ -54,7 +53,8 @@ const token = localStorage.getItem("token")
         </div>
 
       </div>
+      </div>
 
-    </AdminLayout>
+   
   );
 }

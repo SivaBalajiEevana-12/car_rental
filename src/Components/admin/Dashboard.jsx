@@ -16,8 +16,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <AdminLayout>
-
+  
+<div className="bg-gray-950 min-h-screen text-white p-10">
       <h1 className="text-3xl text-yellow-400 mb-8">
         Admin Dashboard
       </h1>
@@ -37,7 +37,8 @@ export default function Dashboard() {
         ))}
 
       </div>
+      </div>
 
-    </AdminLayout>
+  
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { adminAPI } from "../../Services/adminApi";
-import AdminLayout from "./AdminLayout";
+
 
 export default function PaymentsPage() {
   const token = useSelector((state) => state.auth.token)||  localStorage.getItem("token");
@@ -30,7 +30,7 @@ export default function PaymentsPage() {
   };
 
   return (
-    <AdminLayout>
+  
     <div className="bg-gray-950 min-h-screen text-white p-10">
 
       {/* Header */}
@@ -89,6 +89,6 @@ export default function PaymentsPage() {
 
       </div>
     </div>
-    </AdminLayout>
+  
   );
 }

@@ -27,6 +27,16 @@ import Earnings from './Components/owners/Earnings';
 import QuickAddVehicle from './QuickAddVehicle'
 import TestApi from './Components/owners/TestApi'
 import Layout from './Components/Layout' // Import Layout
+import BrowseVehicles from './Components/customer/BrowseVehicles';
+import VehicleDetails from './Components/customer/VehicleDetails';
+import BookingPages from './Components/customer/BookingPages';
+import MyBookings from './Components/customer/MyBookings';
+import BookingDetails from './Components/customer/BookingDetails'
+
+import PaymentPage from './Components/customer/PaymentPage';
+import NotificationsPages from './Components/customer/NotificationsPages';
+import PaymentsHistory from './Components/customer/PaymentsHistory';
+import ProfilePage from './Components/customer/ProfilePage';
 
 function App() {
   return (
@@ -64,6 +74,18 @@ function App() {
         <Route path='/car-owner/bookings/:id' element={<BookingDetail />} />
         <Route path='/car-owner/earnings' element={<Earnings />} />
       </Route>
+      <Route element={<Layout/>}>
+     <Route path='/home' element={<Home />} />
+<Route path="/customer" element={<BrowseVehicles />} />
+<Route path="/customer/vehicles/:id" element={<VehicleDetails />} />
+<Route path="/customer/book/:id" element={<BookingPages />} />
+<Route path="/customer/bookings" element={<MyBookings />} />
+<Route path="/customer/bookings/:id" element={<BookingDetails />} />
+<Route path="/customer/payment/:bookingId" element={<PaymentPage />} />
+<Route path="/customer/notifications" element={<NotificationsPages />} />
+<Route path="/customer/payments" element={<PaymentsHistory />} />
+<Route path="/customer/profile" element={<ProfilePage />} />
+</Route>
       
       {/* 404 Route */}
       <Route path='*' element={<NotFound />} />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { adminAPI } from "../../Services/adminApi";
-import AdminLayout from "./AdminLayout";
+
 
 export default function UsersPage() {
   const token = useSelector((state) => state.auth.token)||  localStorage.getItem("token");
@@ -56,7 +56,7 @@ export default function UsersPage() {
   };
 
   return (
-    <AdminLayout>
+    <>
     <div className="bg-gray-200 min-h-screen p-10">
 
       {/* Title */}
@@ -152,6 +152,6 @@ export default function UsersPage() {
 
       </div>
     </div>
-    </AdminLayout>
+    </>
   );
 }

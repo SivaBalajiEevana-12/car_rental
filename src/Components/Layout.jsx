@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminNavbar from './admin/AdminNavbar';
 import CarOwnerNavbar from './owners/CarOwnerNavbar';
+import CustomerNavbar from './customer/CustomerNavbar';
 
 export default function Layout() {
   const { role, token } = useSelector((state) => state.auth);
@@ -33,7 +34,7 @@ export default function Layout() {
         return <AdminNavbar />;
       case 'customer':
         console.log("Customer role - no navbar yet");
-        return null;
+        return <CustomerNavbar/>;
       default:
         console.log("Unknown role:", role);
         return null;

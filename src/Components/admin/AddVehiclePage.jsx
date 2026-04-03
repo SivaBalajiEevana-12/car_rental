@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 // import { useSelector } from "react-redux";
-import AdminLayout from "./AdminLayout";
+// import AdminLayout from "./AdminLayout";
 
 const API = "http://127.0.0.1:8000/admin";
 
@@ -94,7 +94,7 @@ const token = localStorage.getItem("token"); // 🔹 FIXED TOKEN RETRIEVAL
   };
 
   return (
-    <AdminLayout>
+    
 
       <div className="max-w-2xl mx-auto">
 
@@ -171,6 +171,6 @@ const token = localStorage.getItem("token"); // 🔹 FIXED TOKEN RETRIEVAL
 
       </div>
 
-    </AdminLayout>
+  
   );
 }

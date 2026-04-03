@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminAPI } from "../../Services/adminApi";
-import AdminLayout from "./AdminLayout";
+
 
 export default function VehiclesPage() {
 
@@ -55,7 +55,7 @@ export default function VehiclesPage() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="bg-gray-950 min-h-screen text-white p-10">
 
         {/* Header */}
@@ -148,6 +148,6 @@ export default function VehiclesPage() {
         )}
 
       </div>
-    </AdminLayout>
+    </>
   );
 }
