@@ -1,43 +1,82 @@
+// src/redux/authSlice.jsx
 import { createSlice } from "@reduxjs/toolkit";
 
+// Load initial state from localStorage
+const loadInitialState = () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  
+  if (token && role) {
+    return {
+      user: { email: localStorage.getItem("userEmail") || null },
+      role: role,
+      token: token,
+      loading: false,
+      error: null
+    };
+  }
+  
+  return {
+    user: null,
+    role: null,
+    token: null,
+    loading: false,
+    error: null
+  };
+};
 
-const initialState={
-    user:null,
-    role:null,
-    token:null,
-    setLoading:false,
-    error:null
-}
+const initialState = loadInitialState();
 
-const authSlice=createSlice({
-    name:'auth',
-    initialState,
-    reducers:{
-        loginStart:(state)=>{
-            console.log("Login process started");
-            state.setLoading=true;
-            state.error=null;
-        },
-        loginSuccess:(state,action)=>{
-            state.setLoading=false;
-            state.user=action.payload;
-            state.role=action.payload.role;
-            state.token=action.payload.token;
-            localStorage.setItem("token", action.payload.token);
-            console.log("Login successful, token stored in localStorage:", action.payload.token);
-        },
-        loginFailure:(state,action)=>{
-            state.setLoading=false;
-            state.error=action.payload;
-        },
-        logout:(state)=>{
-            state.user=null;
-            state.role=null;
-            state.token=null;
-            localStorage.removeItem("token");
-            console.log("User logged out, token removed from localStorage");
-        }
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    loginStart: (state) => {
+      console.log("Login process started");
+      state.loading = true;
+      state.error = null;
+    },
+    loginSuccess: (state, action) => {
+      state.loading = false;
+      // Store user data properly
+      state.user = {
+        id: action.payload.user?.id || action.payload.user_id,
+        email: action.payload.user?.email || action.payload.email,
+        name: action.payload.user?.name || action.payload.name
+      };
+      state.role = action.payload.role;
+      state.token = action.payload.token;
+      
+      // Store in localStorage
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("role", action.payload.role);
+      localStorage.setItem("userEmail", state.user.email || "");
+      localStorage.setItem("userName", state.user.name || "");
+      
+      console.log("Login successful - Role:", action.payload.role);
+      console.log("Login successful - Token stored:", action.payload.token);
+    },
+    loginFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.role = null;
+      state.token = null;
+      state.loading = false;
+      state.error = null;
+      
+      // Clear localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userName");
+      
+      console.log("User logged out, token removed from localStorage");
     }
+  }
 })
-export const {loginStart,loginSuccess,loginFailure,logout}=authSlice.actions;
-export default authSlice.reducer
+
+export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
+export default authSlice.reducer;
