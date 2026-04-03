@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { adminAPI } from "../../Services/adminApi";
 import AdminLayout from "./AdminLayout";
 
 export default function RolesPage() {
-  const token = useSelector((state) => state.auth.token);
+  const token =  localStorage.getItem("token");
   const api = adminAPI(token);
 
   const [roles, setRoles] = useState([]);
@@ -85,7 +85,7 @@ export default function RolesPage() {
       {/* Roles List */}
       <div className="grid md:grid-cols-3 gap-6">
 
-        {roles.map((r) => (
+        {roles.length===0 ?roles.map((r) => (
           <div
             key={r._id}
             className="bg-gray-900 p-6 rounded-xl"
@@ -119,7 +119,7 @@ export default function RolesPage() {
             </button>
 
           </div>
-        ))}
+        )):<p className="text-gray-400">No roles found.</p>}
 
       </div>
     </div>

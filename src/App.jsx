@@ -13,6 +13,10 @@ import RolesPage from './Components/admin/RolesPage'
 import PaymentsPage from './Components/admin/PaymentsPage'
 import NotificationsPage from './Components/admin/NotificationsPage'
 import AuditLogsPage from './Components/admin/AuditLogsPage'
+import Dashboard from './Components/admin/Dashboard'
+import FinanceDashboard from './Components/admin/FinanceDashboard'
+import PendingVehiclesPage from './Components/admin/PendingVehicles'
+import AddVehiclePage from './Components/admin/AddVehiclePage'
 
 
 function App() {
@@ -32,7 +36,11 @@ function App() {
 <Route path="/admin/payments" element={<PaymentsPage />} />
 <Route path="/admin/roles" element={<RolesPage />} />
 <Route path="/admin/logs" element={<AuditLogsPage />} />
-<Route path="/admin/notifications" element={<NotificationsPage />} />
+<Route path="/admin/notifications" element={<NotificationsPage />} /> 
+    <Route path="/admin" element={<Dashboard />} />
+<Route path="/admin/add-vehicle" element={<AddVehiclePage />} />
+<Route path="/admin/pending-vehicles" element={<PendingVehiclesPage />} />
+<Route path="/admin/finance" element={<FinanceDashboard />} />
       <Route path="*" element={<NotFound/>}></Route>
     </Routes>
   

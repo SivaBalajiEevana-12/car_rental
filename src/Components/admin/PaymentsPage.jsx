@@ -4,7 +4,7 @@ import { adminAPI } from "../../Services/adminApi";
 import AdminLayout from "./AdminLayout";
 
 export default function PaymentsPage() {
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.token)||  localStorage.getItem("token");
   const api = adminAPI(token);
 
   const [payments, setPayments] = useState([]);

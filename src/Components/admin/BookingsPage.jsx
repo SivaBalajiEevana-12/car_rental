@@ -4,16 +4,28 @@ import { adminAPI } from "../../Services/adminApi";
 import AdminLayout from "./AdminLayout";
 
 export default function BookingsPage() {
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.token)||  localStorage.getItem("token");
   const api = adminAPI(token);
 
   const [bookings, setBookings] = useState([]);
 
   // 🔹 Fetch bookings
-  const fetchBookings = async () => {
+ const fetchBookings = async () => {
+  try {
     const res = await api.getBookings();
-    setBookings(res.data);
-  };
+
+    // 🔥 FIX: normalize response
+    if (Array.isArray(res.data)) {
+      setBookings(res.data);
+    } else {
+      setBookings(res.data.data || []);
+    }
+
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    setBookings([]);
+  }
+};
 
   useEffect(() => {
     fetchBookings();
@@ -50,52 +62,55 @@ export default function BookingsPage() {
             </tr>
           </thead>
 
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b._id} className="border-b border-gray-800">
+<tbody>
+  {bookings.length === 0 ? (
+    <tr>
+      <td colSpan="6" className="text-center p-4 text-gray-400">
+        No bookings found
+      </td>
+    </tr>
+  ) : (
+    bookings.map((b) => (
+      <tr key={b._id} className="border-b border-gray-800">
 
-                <td className="p-4">{b.user_id}</td>
+        <td className="p-4">{b.user_id}</td>
 
-                <td className="p-4">
-                  {b.vehicle_id}
-                </td>
+        <td className="p-4">{b.vehicle_id}</td>
 
-                <td className="p-4">
-                  {new Date(b.start_date).toLocaleDateString()}
-                </td>
+        <td className="p-4">
+          {new Date(b.start_date).toLocaleDateString()}
+        </td>
 
-                <td className="p-4">
-                  {new Date(b.end_date).toLocaleDateString()}
-                </td>
+        <td className="p-4">
+          {new Date(b.end_date).toLocaleDateString()}
+        </td>
 
-                <td className="p-4 text-yellow-400">
-                  {b.status}
-                </td>
+        <td className="p-4 text-yellow-400">
+          {b.status}
+        </td>
 
-                <td className="p-4 flex gap-2">
+        <td className="p-4 flex gap-2">
 
-                  {/* Approve */}
-                  <button
-                    onClick={() => handleAction(b._id, "approved")}
-                    className="bg-green-500 px-3 py-1 rounded"
-                  >
-                    Approve
-                  </button>
+          <button
+            onClick={() => handleAction(b._id, "approved")}
+            className="bg-green-500 px-3 py-1 rounded"
+          >
+            Approve
+          </button>
 
-                  {/* Reject */}
-                  <button
-                    onClick={() => handleAction(b._id, "rejected")}
-                    className="bg-red-500 px-3 py-1 rounded"
-                  >
-                    Reject
-                  </button>
+          <button
+            onClick={() => handleAction(b._id, "rejected")}
+            className="bg-red-500 px-3 py-1 rounded"
+          >
+            Reject
+          </button>
 
-                </td>
+        </td>
 
-              </tr>
-            ))}
-          </tbody>
-
+      </tr>
+    ))
+  )}
+</tbody>
         </table>
 
       </div>

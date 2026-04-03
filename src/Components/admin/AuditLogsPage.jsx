@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { adminAPI } from "../../Services/adminApi";
 import AdminLayout from "./AdminLayout";
 
 export default function AuditLogsPage() {
     
-  const token = useSelector((state) => state.auth.token);
+  // const token = useSelector((state) => state.auth.token);
+  const token = localStorage.getItem("token")
   const api = adminAPI(token);
 
   const [logs, setLogs] = useState([]);
@@ -66,7 +67,7 @@ export default function AuditLogsPage() {
       {/* Logs List */}
       <div className="space-y-4">
 
-        {logs.map((log) => (
+        {logs.length===0 ?logs.map((log) => (
           <div
             key={log._id}
             className="bg-gray-900 p-6 rounded-xl"
@@ -99,7 +100,7 @@ export default function AuditLogsPage() {
             </button>
 
           </div>
-        ))}
+        )):<p className="text-gray-400">No logs found.</p>}
 
       </div>
     </div>

@@ -11,7 +11,10 @@ export default function AdminLayout({ children }) {
     dispatch(logout());
     navigate("/");
   };
-
+{/* <Route path="/admin" element={<Dashboard />} />
+<Route path="/admin/add-vehicle" element={<AddVehiclePage />} />
+<Route path="/admin/pending-vehicles" element={<PendingVehiclesPage />} />
+<Route path="/admin/finance" element={<FinanceDashboard />} /> */}
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">
 
@@ -24,6 +27,15 @@ export default function AdminLayout({ children }) {
 
         <nav className="flex flex-col gap-3">
 
+          <button onClick={() => navigate("/admin/add-vehicle")} className="nav-btn">
+            Add Vehicle
+          </button>
+          <button onClick={() => navigate("/admin/pending-vehicles")} className="nav-btn">
+           pending-vehicles
+          </button>
+          <button onClick={() => navigate("/admin/finance")} className="nav-btn">
+            FinanceDashboard
+          </button>
           <button onClick={() => navigate("/admin")} className="nav-btn">
             Dashboard
           </button>
