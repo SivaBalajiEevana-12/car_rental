@@ -37,6 +37,11 @@ import PaymentPage from './Components/customer/PaymentPage';
 import NotificationsPages from './Components/customer/NotificationsPages';
 import PaymentsHistory from './Components/customer/PaymentsHistory';
 import ProfilePage from './Components/customer/ProfilePage';
+// Add this import
+import EditVehiclePage from './Components/admin/EditVehiclePage';
+
+// Add this route inside your admin routes
+
 
 function App() {
   return (
@@ -62,6 +67,7 @@ function App() {
         <Route path='/admin/pending-vehicles' element={<PendingVehiclesPage />} />
         <Route path='/admin/finance' element={<FinanceDashboard />} />
         <Route path='/user_dashboard' element={<UsersPage />} />
+        <Route path="/admin/vehicles/:id/edit" element={<EditVehiclePage />} />
       </Route>
       
       {/* Owner Routes with Layout */}

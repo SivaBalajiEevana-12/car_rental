@@ -13,6 +13,9 @@ export default function ProfilePage() {
     address: '',
     joined_date: ''
   });
+  const username = useSelector((state)=>state.auth.user?.name);
+  const userEmail = useSelector((state)=>state.auth.user?.email);
+  const userphone = useSelector((state)=>state.auth.user?.phone_number);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,6 +34,7 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
+      console.log(userphone);
       const response = await axios.get('http://127.0.0.1:8000/users/profile', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -153,7 +157,7 @@ export default function ProfilePage() {
                     <User className="w-5 h-5 text-blue-500" />
                     <div>
                       <p className="text-gray-400 text-sm">Full Name</p>
-                      <p className="font-semibold">{profile.name || 'Not set'}</p>
+                      <p className="font-semibold">{profile.name===""?username : profile.name}</p>
                     </div>
                   </div>
                   
@@ -161,7 +165,7 @@ export default function ProfilePage() {
                     <Mail className="w-5 h-5 text-blue-500" />
                     <div>
                       <p className="text-gray-400 text-sm">Email Address</p>
-                      <p className="font-semibold">{profile.email}</p>
+                      <p className="font-semibold">{profile.email ===""?userEmail:profile.email}</p>
                     </div>
                   </div>
                   

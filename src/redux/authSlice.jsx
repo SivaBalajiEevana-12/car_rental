@@ -5,10 +5,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const loadInitialState = () => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+  const userEmail = localStorage.getItem("userEmail");
+  const userName = localStorage.getItem("userName");
+  const userId = localStorage.getItem("userId");
   
   if (token && role) {
     return {
-      user: { email: localStorage.getItem("userEmail") || null },
+      user: {
+        id: userId || null,
+        email: userEmail || null,
+        name: userName || null
+      },
       role: role,
       token: token,
       loading: false,
@@ -37,8 +44,10 @@ const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action) => {
+      console.log("LoginSuccess payload:", action.payload);
+      
       state.loading = false;
-      // Store user data properly
+      // Store user data directly - NOT nested
       state.user = {
         id: action.payload.user?.id || action.payload.user_id,
         email: action.payload.user?.email || action.payload.email,
@@ -52,9 +61,11 @@ const authSlice = createSlice({
       localStorage.setItem("role", action.payload.role);
       localStorage.setItem("userEmail", state.user.email || "");
       localStorage.setItem("userName", state.user.name || "");
+      localStorage.setItem("userId", state.user.id || "");
       
-      console.log("Login successful - Role:", action.payload.role);
-      console.log("Login successful - Token stored:", action.payload.token);
+      console.log("Login successful - User:", state.user);
+      console.log("Login successful - Role:", state.role);
+      console.log("Login successful - Email:", state.user.email);
     },
     loginFailure: (state, action) => {
       state.loading = false;
@@ -72,6 +83,7 @@ const authSlice = createSlice({
       localStorage.removeItem("role");
       localStorage.removeItem("userEmail");
       localStorage.removeItem("userName");
+      localStorage.removeItem("userId");
       
       console.log("User logged out, token removed from localStorage");
     }
