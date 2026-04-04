@@ -23,9 +23,9 @@ import {
   Shield
 } from "lucide-react";
 
-export default function Register() {
+export default function RegisterPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -179,6 +179,15 @@ export default function Register() {
       </div>
 
       <div className="relative w-full max-w-2xl">
+        {/* Back to Home Button - TOP LEFT */}
+        <button
+          onClick={() => navigate('/')}
+          className="absolute -top-16 left-0 flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition group"
+        >
+          <Home className="w-4 h-4 group-hover:-translate-x-1 transition" />
+          <span className="text-sm">Back to Home</span>
+        </button>
+
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 p-3 rounded-2xl shadow-lg mb-4 animate-bounce">

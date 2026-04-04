@@ -69,11 +69,11 @@ export default function Home() {
       const token = localStorage.getItem("token");
       
       // Fetch all active vehicles from the backend
-      const response = await axios.get("http://127.0.0.1:8000/customer/vehicles/search", {
+      const response = await axios.get("http://127.0.0.1:8000/admin/vehicles", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         params: {
           // Optional: Add default filters
-          status: "active"
+          // status: "active"
         }
       });
       

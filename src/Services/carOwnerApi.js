@@ -165,3 +165,22 @@ export const analyticsApi = {
     return response.data;
   }
 };
+// Add to src/Services/customerApi.js
+
+// Profile APIs
+export const profileApi = {
+  getProfile: async () => {
+    const response = await axios.get(`${API_BASE_URL}/profile`, getAuthHeader());
+    return response.data;
+  },
+
+  updateProfile: async (profileData) => {
+    const response = await axios.put(`${API_BASE_URL}/profile`, profileData, getAuthHeader());
+    return response.data;
+  },
+
+  changePassword: async (passwordData) => {
+    const response = await axios.post(`${API_BASE_URL}/change-password`, passwordData, getAuthHeader());
+    return response.data;
+  }
+};
