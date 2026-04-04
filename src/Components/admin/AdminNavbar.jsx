@@ -45,7 +45,13 @@ export default function AdminNavbar() {
     { path: '/admin/finance', name: 'Finance', icon: <TrendingUp className="w-5 h-5" /> },
     { path: '/admin/roles', name: 'Roles', icon: <Shield className="w-5 h-5" /> },
     { path: '/admin/notifications', name: 'Notifications', icon: <Bell className="w-5 h-5" /> },
-    { path: '/admin/logs', name: 'Audit Logs', icon: <FileText className="w-5 h-5" /> }
+    { path: '/admin/logs', name: 'Audit Logs', icon: <FileText className="w-5 h-5" /> },
+    // Add to AdminNavbar.jsx - Add this navigation item
+{
+  path: '/admin/owner-applications',
+  name: 'Owner Apps',
+  icon: <Users className="w-5 h-5" />
+}
   ];
 
   const handleLogout = () => {

@@ -12,9 +12,15 @@ import {
   Eye, 
   EyeOff, 
   Car, 
-  CheckCircle,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  CheckCircle,
+  FileText,
+  CreditCard,
+  Home,
+  Briefcase,
+  Upload,
+  Shield
 } from "lucide-react";
 
 export default function Register() {
@@ -25,7 +31,13 @@ export default function Register() {
     name: "",
     phone_number: "",
     email: "",
-    password: ""
+    password: "",
+    // Required for ALL users
+    license_number: "",
+    license_image_url: "",
+    id_proof_url: "",
+    address: "",
+    experience: ""
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -44,6 +56,7 @@ export default function Register() {
   const validate = () => {
     let newErrors = {};
 
+    // Basic validations
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
@@ -66,8 +79,27 @@ export default function Register() {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      newErrors.password = "Password must contain at least one uppercase letter";
+    }
+
+    // Document validations - REQUIRED FOR ALL USERS
+    if (!formData.license_number) {
+      newErrors.license_number = "Driver's license number is required";
+    }
+    
+    if (!formData.license_image_url) {
+      newErrors.license_image_url = "License image URL is required";
+    } else if (!formData.license_image_url.startsWith("http")) {
+      newErrors.license_image_url = "Please enter a valid URL";
+    }
+    
+    if (!formData.id_proof_url) {
+      newErrors.id_proof_url = "ID proof URL is required";
+    } else if (!formData.id_proof_url.startsWith("http")) {
+      newErrors.id_proof_url = "Please enter a valid URL";
+    }
+    
+    if (!formData.address) {
+      newErrors.address = "Address is required";
     }
 
     return newErrors;
@@ -85,15 +117,23 @@ export default function Register() {
     }
 
     try {
+      // Register user with ALL fields (required for everyone)
       const registrationData = {
         name: formData.name,
         email: formData.email,
         phone_number: formData.phone_number,
-        password: formData.password
+        password: formData.password,
+        license_number: formData.license_number,
+        license_image_url: formData.license_image_url,
+        id_proof_url: formData.id_proof_url,
+        address: formData.address,
+        experience: formData.experience || ""
       };
 
       await axios.post("http://127.0.0.1:8000/register", registrationData);
+      console.log("Registration successful");
 
+      // Auto login after registration
       const loginResponse = await axios.post("http://127.0.0.1:8000/login", {
         email: formData.email,
         password: formData.password
@@ -113,6 +153,7 @@ export default function Register() {
         })
       );
 
+      // Redirect based on role
       if (loginData.role === 'car_owner') {
         navigate('/car-owner-dashboard');
       } else if (loginData.role === 'admin') {
@@ -133,14 +174,14 @@ export default function Register() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center p-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-2xl">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 p-3 rounded-2xl shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 p-3 rounded-2xl shadow-lg mb-4 animate-bounce">
             <Car className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -152,10 +193,18 @@ export default function Register() {
         {/* Registration Card */}
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-800 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Basic Information Section */}
+            <div className="border-b border-gray-800 pb-4 mb-2">
+              <h3 className="text-lg font-semibold text-yellow-400 flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Basic Information
+              </h3>
+            </div>
+
             {/* Name Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Full Name
+                Full Name *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -183,7 +232,7 @@ export default function Register() {
             {/* Phone Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Phone Number
+                Phone Number *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -211,7 +260,7 @@ export default function Register() {
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+                Email Address *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -239,7 +288,7 @@ export default function Register() {
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Password
+                Password *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -274,8 +323,170 @@ export default function Register() {
                 </p>
               )}
               <p className="text-gray-500 text-xs mt-2">
-                Password must be at least 6 characters with one uppercase letter
+                Password must be at least 6 characters
               </p>
+            </div>
+
+            {/* Verification Documents Section - REQUIRED FOR ALL */}
+            <div className="border-b border-gray-800 pb-4 mb-2 mt-4">
+              <h3 className="text-lg font-semibold text-yellow-400 flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Verification Documents (Required for all users)
+              </h3>
+              <p className="text-gray-500 text-xs mt-1">
+                These documents are required for account verification
+              </p>
+            </div>
+
+            {/* License Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Driver's License Number *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CreditCard className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  name="license_number"
+                  placeholder="DL-1234567890"
+                  value={formData.license_number}
+                  onChange={handleChange}
+                  className={`w-full bg-gray-800/50 border ${
+                    errors.license_number ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200`}
+                />
+              </div>
+              {errors.license_number && (
+                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.license_number}
+                </p>
+              )}
+            </div>
+
+            {/* License Image URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                License Image URL *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Upload className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="url"
+                  name="license_image_url"
+                  placeholder="https://example.com/license.jpg"
+                  value={formData.license_image_url}
+                  onChange={handleChange}
+                  className={`w-full bg-gray-800/50 border ${
+                    errors.license_image_url ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200`}
+                />
+              </div>
+              {errors.license_image_url && (
+                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.license_image_url}
+                </p>
+              )}
+              <p className="text-gray-500 text-xs mt-1">
+                Upload a clear image of your driver's license
+              </p>
+            </div>
+
+            {/* ID Proof URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                ID Proof URL *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FileText className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="url"
+                  name="id_proof_url"
+                  placeholder="https://example.com/id-proof.jpg"
+                  value={formData.id_proof_url}
+                  onChange={handleChange}
+                  className={`w-full bg-gray-800/50 border ${
+                    errors.id_proof_url ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200`}
+                />
+              </div>
+              {errors.id_proof_url && (
+                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.id_proof_url}
+                </p>
+              )}
+              <p className="text-gray-500 text-xs mt-1">
+                Upload your Aadhar card, passport, or voter ID
+              </p>
+            </div>
+
+            {/* Address */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Address *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Home className="h-5 w-5 text-gray-500" />
+                </div>
+                <textarea
+                  name="address"
+                  placeholder="Your full address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  rows="3"
+                  className={`w-full bg-gray-800/50 border ${
+                    errors.address ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 resize-none`}
+                />
+              </div>
+              {errors.address && (
+                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.address}
+                </p>
+              )}
+            </div>
+
+            {/* Experience (Optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Driving Experience (Years)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Briefcase className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  name="experience"
+                  placeholder="e.g., 5 years"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800/50 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Verification Notice */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />
+                <div>
+                  <p className="text-yellow-500 text-sm font-semibold">Document Verification Required</p>
+                  <p className="text-gray-400 text-xs">
+                    Your documents will be reviewed by our admin team. This is required for all users to ensure platform safety.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* API Error */}
