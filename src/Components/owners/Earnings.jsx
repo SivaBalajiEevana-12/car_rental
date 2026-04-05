@@ -11,7 +11,7 @@ import {
   ChevronDown,
   RefreshCw
 } from 'lucide-react';
-import { earningsApi } from '../../services/carOwnerApi';
+import { earningsApi } from '../../Services/carOwnerApi';
 
 export default function Earnings() {
   const [earnings, setEarnings] = useState(null);
