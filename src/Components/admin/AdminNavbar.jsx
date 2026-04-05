@@ -51,6 +51,10 @@ export default function AdminNavbar() {
   path: '/admin/owner-applications',
   name: 'Owner Apps',
   icon: <Users className="w-5 h-5" />
+},{
+  path:'/admin/profile',
+  name:'Profile',
+  icon:<User className="w-5 h-5" />
 }
   ];
 

@@ -40,6 +40,16 @@ import PaymentsHistory from './Components/customer/PaymentsHistory';
 import ProfilePage from './Components/customer/ProfilePage';
 // Add this import
 import EditVehiclePage from './Components/admin/EditVehiclePage';
+// Add these imports
+import AdminProfilePage from './Components/admin/AdminProfilePage';
+import CarOwnerProfilePage from './Components/owners/CarOwnerProfilePage';
+
+// Add these routes inside the Layout wrapper
+// For Admin
+
+
+// For Car Owner
+
 
 // Add this route inside your admin routes
 
@@ -64,6 +74,7 @@ function App() {
         <Route path="/admin/owner-applications" element={<OwnerApplicationsPage />} />
         <Route path='/admin/roles' element={<RolesPage />} />
         <Route path='/admin/logs' element={<AuditLogsPage />} />
+        <Route path="/admin/profile" element={<AdminProfilePage />} />
         <Route path='/admin/notifications' element={<NotificationsPage />} />
         <Route path='/admin/add-vehicle' element={<AddVehiclePage />} />
         <Route path='/admin/pending-vehicles' element={<PendingVehiclesPage />} />
@@ -81,6 +92,7 @@ function App() {
         <Route path='/car-owner/bookings' element={<VehicleBookings />} />
         <Route path='/car-owner/bookings/:id' element={<BookingDetail />} />
         <Route path='/car-owner/earnings' element={<Earnings />} />
+        <Route path="/car-owner/profile" element={<CarOwnerProfilePage />} />
       </Route>
       <Route element={<Layout/>}>
      <Route path='/home' element={<Home />} />

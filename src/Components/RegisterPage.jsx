@@ -180,13 +180,13 @@ export default function RegisterPage() {
 
       <div className="relative w-full max-w-2xl">
         {/* Back to Home Button - TOP LEFT */}
-        <button
-          onClick={() => navigate('/')}
-          className="absolute -top-16 left-0 flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition group"
-        >
-          <Home className="w-4 h-4 group-hover:-translate-x-1 transition" />
-          <span className="text-sm">Back to Home</span>
-        </button>
+       <button
+              onClick={() => navigate('/')}
+              className="fixed bottom-6 left-6 flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm hover:bg-gray-700 text-gray-300 hover:text-yellow-400 px-4 py-2 rounded-full shadow-lg transition-all duration-200 group z-50"
+            >
+              <Home className="w-4 h-4 group-hover:-translate-x-1 transition" />
+              <span className="text-sm">Back to Home</span>
+            </button>
 
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">

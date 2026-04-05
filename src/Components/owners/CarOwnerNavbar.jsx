@@ -22,7 +22,8 @@ export default function CarOwnerNavbar() {
   const dispatch = useDispatch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, role } = useSelector((state) => state.auth);
+  // const { user, role } = useSelector((state) => state.auth);
+    const { user, token } = useSelector((state) => state.auth);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -50,10 +51,16 @@ export default function CarOwnerNavbar() {
       path: '/car-owner/earnings',
       name: 'Earnings',
       icon: <DollarSign className="w-5 h-5" />
+    },
+    {
+      path:'/car-owner/profile',
+      name:'Profile',
+      icon:<User className="w-5 h-5" />
     }
   ];
 
   const handleLogout = async () => {
+    console.log('Logging out with token:', token);
     dispatch(logout());
     navigate('/login');
   };
@@ -108,7 +115,7 @@ export default function CarOwnerNavbar() {
                   <User className="w-4 h-4 text-black" />
                 </div>
                 <span className="text-sm font-medium text-gray-300">
-                  {user?.user?.name || user?.user?.email?.split('@')[0] || 'Car Owner'}
+                  {user?.name || user?.email?.split('@')[0] || 'Car Owner'}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
               </button>
@@ -124,7 +131,7 @@ export default function CarOwnerNavbar() {
                     <div className="px-4 py-3 border-b border-gray-700">
                       <p className="text-sm text-gray-400">Signed in as</p>
                       <p className="text-sm font-semibold text-white truncate">
-                        {user?.user?.email || 'carowner@drivenow.com'}
+                        {user?.email || 'carowner@drivenow.com'}
                       </p>
                     </div>
                     <button

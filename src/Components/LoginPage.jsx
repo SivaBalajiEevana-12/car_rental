@@ -105,15 +105,6 @@ export default function LoginPage() {
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Back to Home Button - TOP LEFT */}
-        <button
-          onClick={() => navigate('/')}
-          className="absolute -top-16 left-0 flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition group"
-        >
-          <Home className="w-4 h-4 group-hover:-translate-x-1 transition" />
-          <span className="text-sm">Back to Home</span>
-        </button>
-
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 p-3 rounded-2xl shadow-lg mb-4 animate-bounce">
@@ -127,6 +118,17 @@ export default function LoginPage() {
 
         {/* Login Card */}
         <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-800 p-8">
+          {/* Back to Home Button - Top Right Inside Card */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition group text-sm"
+            >
+              <Home className="w-4 h-4 group-hover:-translate-x-1 transition" />
+              Back to Home
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
