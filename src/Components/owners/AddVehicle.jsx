@@ -21,6 +21,9 @@ export default function AddVehicle() {
     availability_start: '',
     availability_end: '',
     description: '',
+     vehicle_registration_number: '',
+     rc_book_url: '',
+     insurance_url: '',
     images: []
   });
 
@@ -101,7 +104,10 @@ export default function AddVehicle() {
       availability_start: formData.availability_start,
       availability_end: formData.availability_end,
       description: formData.description || '',
-      images: validImageUrls
+      images: validImageUrls,
+        vehicle_registration_number: formData.vehicle_registration_number.trim(),
+        rc_book_url: formData.rc_book_url.trim(),
+        insurance_url: formData.insurance_url.trim(),
     };
 
     console.log('Submitting vehicle data:', vehicleData);
@@ -306,7 +312,62 @@ export default function AddVehicle() {
               placeholder="Describe your vehicle features, condition, and any special notes for renters..."
             />
           </div>
+{/* Vehicle Documents */}
+<div className="bg-gray-900 rounded-xl p-6">
+    <h2 className="text-xl font-semibold mb-4 text-yellow-500">Vehicle Documents</h2>
+    <div className="grid grid-cols-1 gap-4">
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                Vehicle Registration Number *
+            </label>
+            <input
+                type="text"
+                name="vehicle_registration_number"
+                value={formData.vehicle_registration_number}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                placeholder="e.g., KA01AB1234, MH02CD5678"
+            />
+            {error?.vehicle_registration_number && (
+                <p className="text-red-500 text-sm mt-1">{error.vehicle_registration_number}</p>
+            )}
+        </div>
 
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                RC Book URL (PDF/Image) *
+            </label>
+            <input
+                type="url"
+                name="rc_book_url"
+                value={formData.rc_book_url}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                placeholder="https://example.com/rc-book.pdf"
+            />
+            {error?.rc_book_url && (
+                <p className="text-red-500 text-sm mt-1">{error.rc_book_url}</p>
+            )}
+        </div>
+
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                Insurance Document URL (PDF/Image) *
+            </label>
+            <input
+                type="url"
+                name="insurance_url"
+                value={formData.insurance_url}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                placeholder="https://example.com/insurance.pdf"
+            />
+            {error?.insurance_url && (
+                <p className="text-red-500 text-sm mt-1">{error.insurance_url}</p>
+            )}
+        </div>
+    </div>
+</div>  
           {/* Images */}
           <div className="bg-gray-900 rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4 text-yellow-500">Vehicle Images</h2>

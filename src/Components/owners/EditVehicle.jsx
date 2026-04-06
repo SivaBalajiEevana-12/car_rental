@@ -23,6 +23,9 @@ export default function EditVehicle() {
     availability_start: '',
     availability_end: '',
     description: '',
+    vehicle_registration_number: '',  // ✅ ADD THIS
+    rc_book_url: '',                  // ✅ ADD THIS
+    insurance_url: '',                // ✅ ADD THIS
     images: []
   });
   
@@ -43,7 +46,7 @@ export default function EditVehicle() {
     try {
       const data = await vehicleApi.getVehicle(id);
       console.log('Fetched vehicle:', data);
-      
+      console.log('Vehicle images:', imagesToDelete);
       setFormData({
         brand: data.brand || '',
         model: data.model || '',
@@ -55,6 +58,9 @@ export default function EditVehicle() {
         availability_start: data.availability_start ? data.availability_start.split('T')[0] : '',
         availability_end: data.availability_end ? data.availability_end.split('T')[0] : '',
         description: data.description || '',
+        vehicle_registration_number: data.vehicle_registration_number || '',  // ✅ ADD THIS
+        rc_book_url: data.rc_book_url || '',                                  // ✅ ADD THIS
+        insurance_url: data.insurance_url || '',                              // ✅ ADD THIS
         images: data.images || []
       });
       setExistingImages(data.images || []);
@@ -110,6 +116,9 @@ export default function EditVehicle() {
     if (!formData.price_per_day) errors.price_per_day = 'Price per day is required';
     if (!formData.availability_start) errors.availability_start = 'Availability start date is required';
     if (!formData.availability_end) errors.availability_end = 'Availability end date is required';
+    if (!formData.vehicle_registration_number) errors.vehicle_registration_number = 'Vehicle registration number is required';  // ✅ ADD THIS
+    if (!formData.rc_book_url) errors.rc_book_url = 'RC Book URL is required';  // ✅ ADD THIS
+    if (!formData.insurance_url) errors.insurance_url = 'Insurance URL is required';  // ✅ ADD THIS
     
     if (formData.availability_start && formData.availability_end) {
       if (new Date(formData.availability_start) > new Date(formData.availability_end)) {
@@ -148,6 +157,9 @@ export default function EditVehicle() {
       availability_start: formData.availability_start,
       availability_end: formData.availability_end,
       description: formData.description || '',
+      vehicle_registration_number: formData.vehicle_registration_number.trim(),  // ✅ ADD THIS
+      rc_book_url: formData.rc_book_url.trim(),                                  // ✅ ADD THIS
+      insurance_url: formData.insurance_url.trim(),                              // ✅ ADD THIS
       images: allImages
     };
 
@@ -349,6 +361,63 @@ export default function EditVehicle() {
             </div>
           </div>
 
+          {/* Vehicle Documents Section - NEW */}
+          <div className="bg-gray-900 rounded-xl p-6">
+            <h2 className="text-xl font-semibold mb-4 text-yellow-500">Vehicle Documents</h2>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Vehicle Registration Number *
+                </label>
+                <input
+                  type="text"
+                  name="vehicle_registration_number"
+                  value={formData.vehicle_registration_number}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                  placeholder="e.g., KA01AB1234, MH02CD5678"
+                />
+                {error?.vehicle_registration_number && (
+                  <p className="text-red-500 text-sm mt-1">{error.vehicle_registration_number}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  RC Book URL (PDF/Image) *
+                </label>
+                <input
+                  type="url"
+                  name="rc_book_url"
+                  value={formData.rc_book_url}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                  placeholder="https://example.com/rc-book.pdf"
+                />
+                {error?.rc_book_url && (
+                  <p className="text-red-500 text-sm mt-1">{error.rc_book_url}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Insurance Document URL (PDF/Image) *
+                </label>
+                <input
+                  type="url"
+                  name="insurance_url"
+                  value={formData.insurance_url}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                  placeholder="https://example.com/insurance.pdf"
+                />
+                {error?.insurance_url && (
+                  <p className="text-red-500 text-sm mt-1">{error.insurance_url}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Description */}
           <div className="bg-gray-900 rounded-xl p-6">
             <h2 className="text-xl font-semibold mb-4 text-yellow-500">Description</h2>
@@ -387,7 +456,7 @@ export default function EditVehicle() {
                   </div>
                 ))}
               </div>
-              <p className="text-gray-400 text-sm mt-3">Click on the ✕ to remove images</p>
+              <p className="text-gray-400 text-sm mt-3">Click on the trash icon to remove images</p>
             </div>
           )}
 

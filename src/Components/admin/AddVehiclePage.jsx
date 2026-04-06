@@ -21,7 +21,10 @@ export default function AddVehiclePage() {
     availability_start: "",
     availability_end: "",
     description: "",
-    images: []
+    images: [],
+     vehicle_registration_number: "",  // ✅ ADD THIS
+    rc_book_url: "",                  // ✅ ADD THIS
+    insurance_url: "",   
   });
 
   const [imageUrls, setImageUrls] = useState([""]);
@@ -83,7 +86,10 @@ export default function AddVehiclePage() {
           availability_start: form.availability_start,
           availability_end: form.availability_end,
           images: validImageUrls,
-          description: form.description
+          description: form.description,
+          vehicle_registration_number: form.vehicle_registration_number,  // ✅ ADD THIS
+                rc_book_url: form.rc_book_url,                                  // ✅ ADD THIS
+                insurance_url: form.insurance_url, 
         },
         { headers }
       );
@@ -103,7 +109,10 @@ export default function AddVehiclePage() {
         availability_start: "",
         availability_end: "",
         description: "",
-        images: []
+        images: [],
+         vehicle_registration_number: "",  // ✅ ADD THIS
+    rc_book_url: "",                  // ✅ ADD THIS
+    insurance_url: "", 
       });
       setImageUrls([""]);
 
@@ -348,6 +357,55 @@ export default function AddVehiclePage() {
               required
             />
           </div>
+          {/* Vehicle Documents */}
+<div className="bg-gray-900 rounded-xl p-6">
+    <h2 className="text-xl font-semibold mb-4 text-purple-500">Vehicle Documents</h2>
+    <div className="grid grid-cols-1 gap-4">
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                Vehicle Registration Number *
+            </label>
+            <input
+                name="vehicle_registration_number"
+                placeholder="e.g., KA01AB1234"
+                value={form.vehicle_registration_number}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none"
+                required
+            />
+        </div>
+
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                RC Book URL *
+            </label>
+            <input
+                type="url"
+                name="rc_book_url"
+                placeholder="https://example.com/rc-book.pdf"
+                value={form.rc_book_url}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none"
+                required
+            />
+        </div>
+
+        <div>
+            <label className="block text-sm text-gray-400 mb-1">
+                Insurance URL *
+            </label>
+            <input
+                type="url"
+                name="insurance_url"
+                placeholder="https://example.com/insurance.pdf"
+                value={form.insurance_url}
+                onChange={handleChange}
+                className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none"
+                required
+            />
+        </div>
+    </div>
+</div>
 
           {/* Submit Button */}
           <div className="flex gap-4 justify-end sticky bottom-0 bg-gray-950 py-4">

@@ -36,6 +36,9 @@ export default function EditVehiclePage() {
     availability_start: "",
     availability_end: "",
     description: "",
+    vehicle_registration_number: "",  // ✅ ADD THIS
+    rc_book_url: "",                  // ✅ ADD THIS
+    insurance_url: "",                // ✅ ADD THIS
     images: []
   });
   
@@ -58,7 +61,7 @@ export default function EditVehiclePage() {
   const fetchVehicle = async () => {
     setLoading(true);
     try {
-        console.log("images to delete:", imagesToDelete);
+      console.log("Fetching vehicle with ID:", imagesToDelete);
       const response = await axios.get(`${API}/vehicles/${id}`, { headers });
       const vehicle = response.data;
       
@@ -73,6 +76,9 @@ export default function EditVehiclePage() {
         availability_start: vehicle.availability_start ? vehicle.availability_start.split('T')[0] : "",
         availability_end: vehicle.availability_end ? vehicle.availability_end.split('T')[0] : "",
         description: vehicle.description || "",
+        vehicle_registration_number: vehicle.vehicle_registration_number || "",  // ✅ ADD THIS
+        rc_book_url: vehicle.rc_book_url || "",                                  // ✅ ADD THIS
+        insurance_url: vehicle.insurance_url || "",                              // ✅ ADD THIS
         images: vehicle.images || []
       });
       setExistingImages(vehicle.images || []);
@@ -139,6 +145,9 @@ export default function EditVehiclePage() {
       availability_start: formData.availability_start,
       availability_end: formData.availability_end,
       description: formData.description,
+      vehicle_registration_number: formData.vehicle_registration_number,  // ✅ ADD THIS
+      rc_book_url: formData.rc_book_url,                                  // ✅ ADD THIS
+      insurance_url: formData.insurance_url,                              // ✅ ADD THIS
       images: allImages
     };
 
@@ -343,6 +352,57 @@ export default function EditVehiclePage() {
             </div>
           </div>
 
+          {/* Vehicle Documents Section - NEW */}
+          <div className="bg-gray-900 rounded-xl p-6">
+            <h2 className="text-xl font-semibold mb-4 text-purple-500">Vehicle Documents</h2>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Vehicle Registration Number *
+                </label>
+                <input
+                  type="text"
+                  name="vehicle_registration_number"
+                  value={formData.vehicle_registration_number}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  placeholder="e.g., KA01AB1234, MH02CD5678"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  RC Book URL (PDF/Image) *
+                </label>
+                <input
+                  type="url"
+                  name="rc_book_url"
+                  value={formData.rc_book_url}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  placeholder="https://example.com/rc-book.pdf"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Insurance Document URL (PDF/Image) *
+                </label>
+                <input
+                  type="url"
+                  name="insurance_url"
+                  value={formData.insurance_url}
+                  onChange={handleChange}
+                  className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  placeholder="https://example.com/insurance.pdf"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Existing Images */}
           {existingImages.length > 0 && (
             <div className="bg-gray-900 rounded-xl p-6">
@@ -368,7 +428,7 @@ export default function EditVehiclePage() {
                   </div>
                 ))}
               </div>
-              <p className="text-gray-400 text-sm mt-3">Click on the ✕ to remove images</p>
+              <p className="text-gray-400 text-sm mt-3">Click on the trash icon to remove images</p>
             </div>
           )}
 
