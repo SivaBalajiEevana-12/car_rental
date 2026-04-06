@@ -24,7 +24,10 @@ import {
   TrendingUp,
   Fuel,
   Gauge,
-  Navigation
+  Navigation,
+  Facebook,
+  Instagram,
+  Twitter
 } from "lucide-react";
 import axios from "axios";
 
@@ -534,9 +537,15 @@ export default function Home() {
             <div>
               <h3 className="font-semibold mb-4">Follow Us</h3>
               <div className="flex gap-4">
-                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer">📘</div>
-                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer">📷</div>
-                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer">🐦</div>
+                <a href="#" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer group">
+                  <Facebook className="w-5 h-5 text-gray-400 group-hover:text-black" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer group">
+                  <Instagram className="w-5 h-5 text-gray-400 group-hover:text-black" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-500 hover:text-black transition cursor-pointer group">
+                  <Twitter className="w-5 h-5 text-gray-400 group-hover:text-black" />
+                </a>
               </div>
             </div>
           </div>
