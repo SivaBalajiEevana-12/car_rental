@@ -213,9 +213,9 @@ export default function BrowseVehicles() {
             {(!applicationStatus || applicationStatus.status !== 'approved') && (
               <button
                 onClick={() => setShowApplicationModal(true)}
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition transform hover:scale-105"
+                className="bg-blue-500 hover:bg-yellow-400 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition transform hover:scale-105"
               >
-                <UserPlus className="w-5 h-5" />
+                <UserPlus className="w-5 h-5 text-white" />
                 Become a Car Owner
               </button>
             )}

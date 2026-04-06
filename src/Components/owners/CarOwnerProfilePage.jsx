@@ -1,28 +1,26 @@
 // src/Components/owners/CarOwnerProfilePage.jsx
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Car, 
-  Save, 
-  Edit2, 
-  X, 
-  Eye, 
-  EyeOff,
+import axios from "axios";
+import {
   AlertCircle,
-  CheckCircle,
-  Calendar,
-  Lock,
-  MapPin,
   Briefcase,
-  CreditCard,
+  Calendar,
+  Car,
+  CheckCircle,
+  Edit2,
+  Eye,
+  EyeOff,
   FileText,
   Image,
-  Home
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
+  User,
+  X
 } from "lucide-react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const API = "http://127.0.0.1:8000/customer";
 
