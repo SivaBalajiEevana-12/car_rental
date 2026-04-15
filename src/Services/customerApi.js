@@ -36,9 +36,47 @@ export const vehicleApi = {
 };
 
 // Booking APIs
+// export const bookingApi = {
+//   createBooking: async (bookingData) => {
+//     const response = await axios.post(`${API_BASE_URL}/bookings`, bookingData, getAuthHeader());
+//     return response.data;
+//   },
+
+//   getMyBookings: async (status = null) => {
+//     let url = `${API_BASE_URL}/bookings`;
+//     if (status) {
+//       url += `?status=${status}`;
+//     }
+//     const response = await axios.get(url, getAuthHeader());
+//     return response.data;
+//   },
+
+//   getBookingDetails: async (bookingId) => {
+//     const response = await axios.get(`${API_BASE_URL}/bookings/${bookingId}`, getAuthHeader());
+//     return response.data;
+//   },
+
+//   modifyBooking: async (bookingId, modifyData) => {
+//     const response = await axios.put(`${API_BASE_URL}/bookings/${bookingId}/modify`, modifyData, getAuthHeader());
+//     return response.data;
+//   },
+
+//   cancelBooking: async (bookingId) => {
+//     const response = await axios.patch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {}, getAuthHeader());
+//     return response.data;
+//   }
+// };
+// src/Services/customerApi.js - Add/update booking functions
+
+// Booking APIs
 export const bookingApi = {
   createBooking: async (bookingData) => {
-    const response = await axios.post(`${API_BASE_URL}/bookings`, bookingData, getAuthHeader());
+    const token = localStorage.getItem('token');
+    const response = await axios.post(
+      `${API_BASE_URL}/bookings`, 
+      bookingData, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
     return response.data;
   },
 
@@ -66,7 +104,6 @@ export const bookingApi = {
     return response.data;
   }
 };
-
 // Payment APIs
 export const paymentApi = {
   processPayment: async (paymentData) => {

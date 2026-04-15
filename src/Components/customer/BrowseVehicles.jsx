@@ -1,4 +1,4 @@
-// src/Components/customer/BrowseVehicles.jsx
+// src/Components/customer/BrowseVehicles.jsx (Fixed Version)
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -16,7 +16,12 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Award
+  Award,
+  Upload,
+  FileText,
+  CreditCard,
+  X,
+  Plus
 } from 'lucide-react';
 import { vehicleApi } from '../../Services/customerApi';
 import axios from 'axios';
@@ -28,16 +33,22 @@ export default function BrowseVehicles() {
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [applicationLoading, setApplicationLoading] = useState(false);
+  
+  // Complete vehicle application form - matching backend expected fields
   const [applicationData, setApplicationData] = useState({
-    vehicle_registration_number: '',
-    vehicle_type: '',
+    // Basic Information - Using backend expected field names
     vehicle_brand: '',
     vehicle_model: '',
     vehicle_year: new Date().getFullYear(),
+    vehicle_type: '',
+    // Documents
+    vehicle_registration_number: '',
     rc_book_url: '',
     insurance_url: '',
+    // Images
     vehicle_images: ['']
   });
+  
   const [applicationError, setApplicationError] = useState('');
   const [applicationSuccess, setApplicationSuccess] = useState('');
   
@@ -52,8 +63,8 @@ export default function BrowseVehicles() {
     sort_by: ''
   });
 
-  const vehicleTypes = ['Sedan', 'SUV', 'Hatchback', 'Luxury', 'MUV', 'Convertible'];
-  const fuelTypes = ['Petrol', 'Diesel', 'Electric', 'Hybrid'];
+  const vehicleTypes = ['Sedan', 'SUV', 'Hatchback', 'Luxury', 'MUV', 'Convertible', 'Truck', 'Van'];
+  const fuelTypes = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
 
   useEffect(() => {
     searchVehicles();
@@ -136,33 +147,83 @@ export default function BrowseVehicles() {
     });
   };
 
+  const validateApplication = () => {
+    const errors = [];
+    if (!applicationData.vehicle_brand) errors.push("Vehicle brand is required");
+    if (!applicationData.vehicle_model) errors.push("Vehicle model is required");
+    if (!applicationData.vehicle_year) errors.push("Vehicle year is required");
+    if (!applicationData.vehicle_type) errors.push("Vehicle type is required");
+    if (!applicationData.vehicle_registration_number) errors.push("Vehicle registration number is required");
+    if (!applicationData.rc_book_url) errors.push("RC Book URL is required");
+    if (!applicationData.insurance_url) errors.push("Insurance URL is required");
+    
+    // Filter out empty image URLs
+    const validImages = applicationData.vehicle_images.filter(url => url.trim() !== '');
+    if (validImages.length === 0) {
+      errors.push("At least one vehicle image URL is required");
+    }
+    return errors;
+  };
+
   const submitApplication = async (e) => {
     e.preventDefault();
     setApplicationLoading(true);
     setApplicationError('');
     setApplicationSuccess('');
 
+    // Validate form
+    const validationErrors = validateApplication();
+    if (validationErrors.length > 0) {
+      setApplicationError(validationErrors.join(", "));
+      setApplicationLoading(false);
+      return;
+    }
+
     // Filter out empty image URLs
     const validImages = applicationData.vehicle_images.filter(url => url.trim() !== '');
 
+    // Prepare data exactly as backend expects
     const submitData = {
-      ...applicationData,
-      vehicle_images: validImages,
-      vehicle_year: parseInt(applicationData.vehicle_year)
+      vehicle_registration_number: applicationData.vehicle_registration_number,
+      vehicle_type: applicationData.vehicle_type,
+      vehicle_brand: applicationData.vehicle_brand,
+      vehicle_model: applicationData.vehicle_model,
+      vehicle_year: parseInt(applicationData.vehicle_year),
+      rc_book_url: applicationData.rc_book_url,
+      insurance_url: applicationData.insurance_url,
+      vehicle_images: validImages
     };
+
+    console.log("Submitting application data:", submitData);
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://127.0.0.1:8000/customer/apply-owner', submitData, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.post('http://127.0.0.1:8000/customer/apply-owner', submitData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      console.log("Application response:", response.data);
       setApplicationSuccess('Application submitted successfully! Our team will review your application.');
       setTimeout(() => {
         setShowApplicationModal(false);
         setApplicationSuccess('');
         checkApplicationStatus();
+        // Reset form
+        setApplicationData({
+          vehicle_brand: '',
+          vehicle_model: '',
+          vehicle_year: new Date().getFullYear(),
+          vehicle_type: '',
+          vehicle_registration_number: '',
+          rc_book_url: '',
+          insurance_url: '',
+          vehicle_images: ['']
+        });
       }, 3000);
     } catch (error) {
+      console.error("Application error:", error.response?.data);
       setApplicationError(error.response?.data?.detail || 'Failed to submit application');
     } finally {
       setApplicationLoading(false);
@@ -213,9 +274,9 @@ export default function BrowseVehicles() {
             {(!applicationStatus || applicationStatus.status !== 'approved') && (
               <button
                 onClick={() => setShowApplicationModal(true)}
-                className="bg-blue-500 hover:bg-yellow-400 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition transform hover:scale-105"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition transform hover:scale-105"
               >
-                <UserPlus className="w-5 h-5 text-white" />
+                <UserPlus className="w-5 h-5" />
                 Become a Car Owner
               </button>
             )}
@@ -413,14 +474,14 @@ export default function BrowseVehicles() {
         )}
       </div>
 
-      {/* Apply for Car Owner Modal */}
+      {/* Apply for Car Owner Modal - Matching Backend Expected Fields */}
       {showApplicationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-gray-900 rounded-xl p-6 max-w-2xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 sticky top-0 bg-gray-900 pb-4 border-b border-gray-800">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Award className="w-6 h-6 text-yellow-500" />
-                Become a Car Owner
+                Register as Car Owner
               </h2>
               <button
                 onClick={() => setShowApplicationModal(false)}
@@ -431,7 +492,7 @@ export default function BrowseVehicles() {
             </div>
 
             <p className="text-gray-400 mb-6">
-              Fill out the form below to apply for becoming a car owner. Our team will review your application and get back to you.
+              Fill out the form below to register as a car owner and list your vehicle for rent.
             </p>
 
             {applicationError && (
@@ -448,165 +509,165 @@ export default function BrowseVehicles() {
               </div>
             )}
 
-            <form onSubmit={submitApplication} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Vehicle Registration Number *
-                </label>
-                <input
-                  type="text"
-                  name="vehicle_registration_number"
-                  placeholder="KA-01-AB-1234"
-                  value={applicationData.vehicle_registration_number}
-                  onChange={handleApplicationChange}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Vehicle Brand *
-                  </label>
-                  <input
-                    type="text"
-                    name="vehicle_brand"
-                    placeholder="Toyota, Honda, BMW"
-                    value={applicationData.vehicle_brand}
-                    onChange={handleApplicationChange}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Vehicle Model *
-                  </label>
-                  <input
-                    type="text"
-                    name="vehicle_model"
-                    placeholder="Camry, Civic, X5"
-                    value={applicationData.vehicle_model}
-                    onChange={handleApplicationChange}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Vehicle Type *
-                  </label>
-                  <select
-                    name="vehicle_type"
-                    value={applicationData.vehicle_type}
-                    onChange={handleApplicationChange}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                    required
-                  >
-                    <option value="">Select Type</option>
-                    {vehicleTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Vehicle Year *
-                  </label>
-                  <input
-                    type="number"
-                    name="vehicle_year"
-                    placeholder="2024"
-                    value={applicationData.vehicle_year}
-                    onChange={handleApplicationChange}
-                    min={1990}
-                    max={new Date().getFullYear() + 1}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                    required
-                  />
+            <form onSubmit={submitApplication} className="space-y-6">
+              {/* Basic Information Section */}
+              <div className="border-b border-gray-800 pb-4">
+                <h3 className="text-lg font-semibold text-yellow-500 mb-4 flex items-center gap-2">
+                  <Car className="w-5 h-5" />
+                  Vehicle Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Brand *</label>
+                    <input
+                      type="text"
+                      name="vehicle_brand"
+                      placeholder="e.g., Toyota, Honda, BMW"
+                      value={applicationData.vehicle_brand}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Model *</label>
+                    <input
+                      type="text"
+                      name="vehicle_model"
+                      placeholder="e.g., Camry, Civic, X5"
+                      value={applicationData.vehicle_model}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Year *</label>
+                    <input
+                      type="number"
+                      name="vehicle_year"
+                      placeholder="2024"
+                      value={applicationData.vehicle_year}
+                      onChange={handleApplicationChange}
+                      min={1990}
+                      max={new Date().getFullYear() + 1}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Type *</label>
+                    <select
+                      name="vehicle_type"
+                      value={applicationData.vehicle_type}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    >
+                      <option value="">Select type</option>
+                      {vehicleTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  RC Book URL *
-                </label>
-                <input
-                  type="url"
-                  name="rc_book_url"
-                  placeholder="https://example.com/rc-book.pdf"
-                  value={applicationData.rc_book_url}
-                  onChange={handleApplicationChange}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                  required
-                />
+              {/* Documents Section */}
+              <div className="border-b border-gray-800 pb-4">
+                <h3 className="text-lg font-semibold text-yellow-500 mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Vehicle Documents
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Registration Number *</label>
+                    <input
+                      type="text"
+                      name="vehicle_registration_number"
+                      placeholder="KA-01-AB-1234"
+                      value={applicationData.vehicle_registration_number}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">RC Book URL *</label>
+                    <input
+                      type="url"
+                      name="rc_book_url"
+                      placeholder="https://example.com/rc-book.pdf"
+                      value={applicationData.rc_book_url}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Insurance Document URL *</label>
+                    <input
+                      type="url"
+                      name="insurance_url"
+                      placeholder="https://example.com/insurance.pdf"
+                      value={applicationData.insurance_url}
+                      onChange={handleApplicationChange}
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Images Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Insurance Document URL *
-                </label>
-                <input
-                  type="url"
-                  name="insurance_url"
-                  placeholder="https://example.com/insurance.pdf"
-                  value={applicationData.insurance_url}
-                  onChange={handleApplicationChange}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Vehicle Images URLs
-                </label>
+                <h3 className="text-lg font-semibold text-yellow-500 mb-4 flex items-center gap-2">
+                  <Upload className="w-5 h-5" />
+                  Vehicle Images
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">Add image URLs of your vehicle (at least one required)</p>
                 {applicationData.vehicle_images.map((url, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
+                  <div key={index} className="flex gap-2 mb-3">
                     <input
                       type="url"
                       value={url}
                       onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                      placeholder={`Image URL ${index + 1}`}
+                      placeholder={`https://example.com/image${index + 1}.jpg`}
                       className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none"
                     />
                     {index === applicationData.vehicle_images.length - 1 ? (
                       <button
                         type="button"
                         onClick={addImageField}
-                        className="bg-green-500 hover:bg-green-600 px-3 rounded-lg text-white"
+                        className="bg-green-500 hover:bg-green-600 px-4 rounded-lg transition text-white"
                       >
-                        +
+                        <Plus className="w-5 h-5" />
                       </button>
                     ) : (
                       <button
                         type="button"
                         onClick={() => removeImageField(index)}
-                        className="bg-red-500 hover:bg-red-600 px-3 rounded-lg text-white"
+                        className="bg-red-500 hover:bg-red-600 px-4 rounded-lg transition text-white"
                       >
-                        ×
+                        <X className="w-5 h-5" />
                       </button>
                     )}
                   </div>
                 ))}
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-4 sticky bottom-0 bg-gray-900 py-4 border-t border-gray-800">
                 <button
                   type="submit"
                   disabled={applicationLoading}
-                  className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 rounded-lg transition disabled:opacity-50"
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-3 rounded-lg transition disabled:opacity-50"
                 >
                   {applicationLoading ? 'Submitting...' : 'Submit Application'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowApplicationModal(false)}
-                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg transition"
+                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg transition"
                 >
                   Cancel
                 </button>

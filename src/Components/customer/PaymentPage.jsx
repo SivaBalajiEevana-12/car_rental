@@ -1,21 +1,15 @@
 // src/Components/customer/PaymentPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CreditCard, Lock, AlertCircle, CheckCircle } from 'lucide-react';
-import { bookingApi, paymentApi } from '../../Services/customerApi';
+import { CreditCard, Lock, AlertCircle, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import axios from 'axios';
 
 export default function PaymentPage() {
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
-  const [cardDetails, setCardDetails] = useState({
-    card_number: '',
-    expiry_date: '',
-    cvv: ''
-  });
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -24,41 +18,114 @@ export default function PaymentPage() {
 
   const fetchBooking = async () => {
     try {
-      const data = await bookingApi.getBookingDetails(bookingId);
-      setBooking(data);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `http://127.0.0.1:8000/customer/bookings/${bookingId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setBooking(response.data);
     } catch (error) {
       console.error('Error:', error);
+      setError(error.response?.data?.detail || 'Failed to load booking details');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCardChange = (e) => {
-    setCardDetails({
-      ...cardDetails,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRazorpayPayment = async () => {
+    setProcessing(true);
     setError('');
-    setSubmitting(true);
-
+    
     try {
-      await paymentApi.processPayment({
-        booking_id: bookingId,
-        payment_method: paymentMethod,
-        amount: booking.total_cost,
-        card_number: cardDetails.card_number,
-        expiry_date: cardDetails.expiry_date,
-        cvv: cardDetails.cvv
-      });
-      navigate(`/customer/payment/success/${bookingId}`);
+      const token = localStorage.getItem('token');
+      
+      // Create Razorpay order
+      const orderRes = await axios.post(
+        'http://127.0.0.1:8000/customer/create-razorpay-order',
+        {
+          booking_id: bookingId,
+          amount: Math.round(booking.total_cost * 100) // Convert to paise
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const { order_id, amount, currency, key_id } = orderRes.data;
+      
+      // Load Razorpay script
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      
+      script.onload = () => {
+        const options = {
+          key: key_id,
+          amount: amount,
+          currency: currency,
+          name: "DriveNow",
+          description: `Payment for Booking #${bookingId.slice(-8)}`,
+          image: "/logo.png",
+          order_id: order_id,
+          prefill: {
+            name: booking.customer_name || '',
+            email: booking.customer_email || '',
+            contact: booking.customer_phone || ''
+          },
+          notes: {
+            booking_id: bookingId,
+            vehicle: `${booking.brand} ${booking.model}`
+          },
+          theme: {
+            color: "#3B82F6"
+          },
+          modal: {
+            ondismiss: () => {
+              setProcessing(false);
+              setError("Payment cancelled by user");
+            }
+          },
+          handler: async (response) => {
+            try {
+              // Verify payment
+              const verifyRes = await axios.post(
+                'http://127.0.0.1:8000/customer/verify-razorpay-payment',
+                {
+                  order_id: response.razorpay_order_id,
+                  payment_id: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                  booking_id: bookingId
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              
+              if (verifyRes.data.success) {
+                navigate(`/customer/payment-success/${bookingId}`);
+              } else {
+                setError(verifyRes.data.message);
+              }
+            } catch (error) {
+              console.error('Payment verification failed:', error);
+              setError(error.response?.data?.detail || 'Payment verification failed');
+            } finally {
+              setProcessing(false);
+            }
+          }
+        };
+        
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      };
+      
+      script.onerror = () => {
+        setError('Failed to load Razorpay SDK');
+        setProcessing(false);
+      };
+      
+      document.body.appendChild(script);
+      
     } catch (error) {
-      setError(error.response?.data?.detail || 'Payment failed. Please try again.');
-    } finally {
-      setSubmitting(false);
+      console.error('Error creating order:', error);
+      setError(error.response?.data?.detail || 'Failed to initiate payment');
+      setProcessing(false);
     }
   };
 
@@ -70,143 +137,128 @@ export default function PaymentPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold mb-6">Complete Payment</h1>
+  if (error && !booking) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+        <div className="bg-red-500/20 border border-red-500 rounded-xl p-6 max-w-md text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-red-500 mb-2">Error</h2>
+          <p className="text-gray-300">{error}</p>
+          <button
+            onClick={() => navigate(`/customer/bookings/${bookingId}`)}
+            className="mt-4 bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Payment Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-gray-900 rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Payment Details</h2>
-              
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(`/customer/bookings/${bookingId}`)}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition" />
+          Back to Booking
+        </button>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Payment Options */}
+          <div className="md:col-span-2">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-blue-500" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">Secure Payment</h2>
+                  <p className="text-gray-400 text-sm">Pay with Razorpay</p>
+                </div>
+              </div>
+
+              {/* Security Info */}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl">
+                  <Lock className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-gray-300">100% Secure Payments</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-gray-300">Instant Booking Confirmation</span>
+                </div>
+              </div>
+
+              {/* Razorpay Option */}
+              <div className="border border-gray-700 rounded-xl p-4 mb-4 hover:border-blue-500 transition cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <CreditCard className="w-6 h-6 text-blue-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Razorpay</h3>
+                      <p className="text-sm text-gray-400">Credit/Debit Card, UPI, NetBanking, Wallet</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRazorpayPayment}
+                    disabled={processing}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {processing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Pay Now'
+                    )}
+                  </button>
+                </div>
+              </div>
+
               {error && (
-                <div className="bg-red-500 text-white p-4 rounded-lg mb-6 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5" />
+                <div className="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-500 text-sm flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
                   {error}
                 </div>
               )}
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Payment Method</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('credit_card')}
-                      className={`p-3 rounded-lg border-2 transition ${
-                        paymentMethod === 'credit_card'
-                          ? 'border-blue-500 bg-blue-500/10'
-                          : 'border-gray-700 hover:border-gray-600'
-                      }`}
-                    >
-                      <CreditCard className="w-6 h-6 mx-auto mb-1" />
-                      <span className="text-sm">Credit Card</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('debit_card')}
-                      className={`p-3 rounded-lg border-2 transition ${
-                        paymentMethod === 'debit_card'
-                          ? 'border-blue-500 bg-blue-500/10'
-                          : 'border-gray-700 hover:border-gray-600'
-                      }`}
-                    >
-                      <CreditCard className="w-6 h-6 mx-auto mb-1" />
-                      <span className="text-sm">Debit Card</span>
-                    </button>
-                  </div>
-                </div>
-
-                {(paymentMethod === 'credit_card' || paymentMethod === 'debit_card') && (
-                  <>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-1">Card Number</label>
-                      <input
-                        type="text"
-                        name="card_number"
-                        placeholder="1234 5678 9012 3456"
-                        value={cardDetails.card_number}
-                        onChange={handleCardChange}
-                        className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm text-gray-400 mb-1">Expiry Date</label>
-                        <input
-                          type="text"
-                          name="expiry_date"
-                          placeholder="MM/YY"
-                          value={cardDetails.expiry_date}
-                          onChange={handleCardChange}
-                          className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-gray-400 mb-1">CVV</label>
-                        <input
-                          type="password"
-                          name="cvv"
-                          placeholder="123"
-                          value={cardDetails.cvv}
-                          onChange={handleCardChange}
-                          className="w-full bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {submitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-5 h-5" />
-                      Pay ₹{booking?.total_cost?.toLocaleString()}
-                    </>
-                  )}
-                </button>
-              </form>
             </div>
           </div>
 
           {/* Order Summary */}
           <div>
-            <div className="bg-gray-900 rounded-xl p-6 sticky top-24">
-              <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 sticky top-24">
+              <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+              
+              <div className="space-y-3 pb-4 border-b border-gray-800">
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Booking ID</span>
-                  <span className="font-mono text-sm">{booking?._id?.slice(-8)}</span>
+                  <span className="font-mono">{bookingId.slice(-8)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Rental Period</span>
-                  <span>
-                    {new Date(booking?.start_date).toLocaleDateString()} - {new Date(booking?.end_date).toLocaleDateString()}
-                  </span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Vehicle</span>
+                  <span>{booking?.brand} {booking?.model}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Days</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Duration</span>
                   <span>{booking?.days} days</span>
                 </div>
-                <div className="border-t border-gray-800 pt-3 mt-3">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span className="text-blue-500">₹{booking?.total_cost?.toLocaleString()}</span>
-                  </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Daily Rate</span>
+                  <span>₹{booking?.price_per_day?.toLocaleString()}</span>
+                </div>
+              </div>
+              
+              <div className="pt-4">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total Amount</span>
+                  <span className="text-blue-500">₹{booking?.total_cost?.toLocaleString()}</span>
                 </div>
               </div>
             </div>

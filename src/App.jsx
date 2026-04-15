@@ -43,7 +43,7 @@ import EditVehiclePage from './Components/admin/EditVehiclePage';
 // Add these imports
 import AdminProfilePage from './Components/admin/AdminProfilePage';
 import CarOwnerProfilePage from './Components/owners/CarOwnerProfilePage';
-
+import PaymentSuccess from './Components/customer/PaymentSuccess';
 // Add these routes inside the Layout wrapper
 // For Admin
 
@@ -105,6 +105,7 @@ function App() {
 <Route path="/customer/notifications" element={<NotificationsPages />} />
 <Route path="/customer/payments" element={<PaymentsHistory />} />
 <Route path="/customer/profile" element={<ProfilePage />} />
+<Route path="/customer/payment-success/:bookingId" element={<PaymentSuccess />} />
 </Route>
       
       {/* 404 Route */}
@@ -114,3 +115,4 @@ function App() {
 }
 
 export default App
+// cd car-rental-system-backend 
